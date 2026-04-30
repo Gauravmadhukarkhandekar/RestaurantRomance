@@ -1,0 +1,26 @@
+service: pike-place-pair-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-west-2 # Seattle adjacent
+  stage: dev
+  environment:
+    DYNAMODB_TABLE_USERS: ${self:service}-users-${sls:stage}
+    DYNAMODB_TABLE_RESTAURANTS: ${self:service}-restaurants-${sls:stage}
+    DYNAMODB_TABLE_MATCHES: ${self:service}-matches-${sls:stage}
+    DYNAMODB_TABLE_BOOKINGS: ${self:service}-bookings-${sls:stage}
+
+functions:
+  api:
+    handler: app.handler
+    events:
+      - httpApi: '*'
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+custom:
+  serverless-offline:
+    httpPort: 4000

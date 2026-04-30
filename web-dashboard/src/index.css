@@ -1,0 +1,14 @@
+:root {
+  --indigo: #1A237E;
+  --copper: #B87333;
+  --deep: #0F0F1B;
+  --surface: #1E1E2E;
+  --text: #FFFFFF;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+}
+
+* { box-sizing: border-box; }
