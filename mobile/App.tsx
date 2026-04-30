@@ -8,6 +8,8 @@ import { theme } from './src/theme';
 import DiscoveryScreen from './src/screens/DiscoveryScreen';
 import RestaurantListScreen from './src/screens/RestaurantListScreen';
 import BookingScreen from './src/screens/BookingScreen';
+import AuthScreen from './src/screens/AuthScreen';
+import ProfileSetupScreen from './src/screens/ProfileSetupScreen';
 
 const Stack = createStackNavigator();
 
@@ -17,7 +19,7 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Home"
+            initialRouteName="Auth"
             screenOptions={{
               headerStyle: {
                 backgroundColor: theme.colors.background,
@@ -30,6 +32,16 @@ const App = () => {
               },
             }}
           >
+            <Stack.Screen 
+              name="Auth" 
+              component={AuthScreen} 
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen 
+              name="ProfileSetup" 
+              component={ProfileSetupScreen} 
+              options={{ headerShown: false }}
+            />
             <Stack.Screen 
               name="Home" 
               component={DiscoveryScreen} 

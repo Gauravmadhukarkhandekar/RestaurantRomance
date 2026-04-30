@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Heart, X, MapPin, Star, Utensils, Calendar } from 'lucide-react';
+import { auth } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import AdminPortal from './components/AdminPortal';
+import Login from './components/Login';
 
 const API_URL = 'http://localhost:4000/api';
 
@@ -10,8 +14,28 @@ const MOCK_USERS = [
 ];
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(MOCK_USERS[0]);
   const [view, setView] = useState('discover'); // discover, restaurants
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleLogout = () => signOut(auth);
+
+  if (loading) return (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F0F1B' }}>
+      <div style={{ color: '#B87333', fontSize: '20px' }}>Loading...</div>
+    </div>
+  );
+
+  if (!user) return <Login />;
 
   const handleSwipe = async (dir) => {
     try {
@@ -41,6 +65,14 @@ function App() {
           <button onClick={() => setView('restaurants')} style={{ background: 'none', border: 'none', color: view === 'restaurants' ? '#B87333' : '#A0A0B0', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '18px' }}>
             <Utensils size={20} /> Curated Dates
           </button>
+          <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+             <button onClick={() => setView('admin')} style={{ background: 'none', border: 'none', color: view === 'admin' ? '#B87333' : '#A0A0B0', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '16px', opacity: 0.8 }}>
+               <MapPin size={18} /> Admin Panel
+             </button>
+             <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#FF5252', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', opacity: 0.7 }}>
+               Logout
+             </button>
+          </div>
         </nav>
       </div>
 
@@ -59,7 +91,7 @@ function App() {
               </div>
             </div>
           </div>
-        ) : (
+        ) : view === 'restaurants' ? (
           <div style={{ width: '100%', maxWidth: '800px' }}>
             <h2 style={{ fontSize: '32px', marginBottom: '32px' }}>Top Picks in Seattle</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
@@ -78,6 +110,8 @@ function App() {
               ))}
             </div>
           </div>
+        ) : (
+          <AdminPortal />
         )}
 
         {/* Rain Effect Texture Placeholder */}
