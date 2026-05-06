@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { Heart, Lock, Mail, Loader2 } from 'lucide-react';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:4000/api';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,17 +13,32 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const syncUserToBackend = async (user) => {
+    try {
+      await axios.post(`${API_URL}/admin/users/sync`, {
+        userId: user.uid,
+        name: user.displayName || email.split('@')[0] || 'New User',
+        email: user.email,
+        profileImage: user.photoURL
+      });
+    } catch (e) {
+      console.error("Error syncing user to AWS:", e);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     
     try {
+      let result;
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        result = await signInWithEmailAndPassword(auth, email, password);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        result = await createUserWithEmailAndPassword(auth, email, password);
       }
+      await syncUserToBackend(result.user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -33,7 +51,8 @@ const Login = () => {
     setError('');
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      await syncUserToBackend(result.user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -62,18 +81,6 @@ const Login = () => {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Decorative element */}
-        <div style={{ 
-          position: 'absolute', 
-          top: '-100px', 
-          right: '-100px', 
-          width: '200px', 
-          height: '200px', 
-          background: 'rgba(184, 115, 51, 0.1)', 
-          borderRadius: '50%',
-          filter: 'blur(40px)'
-        }}></div>
-
         <div style={{ textAlign: 'center', marginBottom: '40px', position: 'relative' }}>
           <div style={{ 
             width: '64px', 
@@ -113,8 +120,7 @@ const Login = () => {
                 borderRadius: '16px', 
                 color: 'white',
                 fontSize: '16px',
-                outline: 'none',
-                transition: 'border-color 0.3s'
+                outline: 'none'
               }}
             />
           </div>
@@ -159,15 +165,13 @@ const Login = () => {
               fontSize: '16px',
               fontWeight: 'bold', 
               cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'transform 0.2s, background-color 0.3s',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '10px'
             }}
           >
-            {loading ? <Loader2 size={20} className="animate-spin" /> : null}
-            {isLogin ? 'Sign In' : 'Create Account'}
+            {loading ? <Loader2 size={20} className="animate-spin" /> : 'Continue'}
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', margin: '10px 0' }}>
@@ -192,11 +196,8 @@ const Login = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '12px',
-              transition: 'background-color 0.3s'
+              gap: '12px'
             }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '18px' }} />
             Continue with Google

@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
 import { auth } from '../utils/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  GoogleAuthProvider, 
+  signInWithPopup 
+} from 'firebase/auth';
 import { theme } from '../theme';
 
 const AuthScreen = ({ navigation }: any) => {
@@ -17,6 +22,17 @@ const AuthScreen = ({ navigation }: any) => {
         await createUserWithEmailAndPassword(auth, email, password);
         navigation.navigate('ProfileSetup');
       }
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      // Navigate to Home (or ProfileSetup if needed)
+      navigation.navigate('Home');
     } catch (error: any) {
       alert(error.message);
     }
@@ -55,6 +71,16 @@ const AuthScreen = ({ navigation }: any) => {
 
             <TouchableOpacity style={styles.button} onPress={handleAuth}>
               <Text style={styles.buttonText}>{isLogin ? 'Sign In' : 'Create Account'}</Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider}>
+              <View style={styles.line} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.line} />
+            </View>
+
+            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleAuth}>
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
@@ -121,6 +147,35 @@ const styles = StyleSheet.create({
     color: '#A0A0B0',
     textAlign: 'center',
     marginTop: 24,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  dividerText: {
+    color: '#A0A0B0',
+    paddingHorizontal: 16,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  googleButton: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  googleButtonText: {
+    color: '#0F0F1B',
+    fontWeight: 'bold',
+    fontSize: 16,
   }
 });
 

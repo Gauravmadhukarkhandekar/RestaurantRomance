@@ -1,5 +1,5 @@
 const { docClient, TABLES } = require('../utils/db');
-const { PutCommand, GetCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, GetCommand, UpdateCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const crypto = require('crypto');
 
 const createBooking = async (req, res) => {
@@ -73,7 +73,18 @@ const getBooking = async (req, res) => {
   }
 };
 
+const getAllBookings = async (req, res) => {
+  try {
+    const { Items } = await docClient.send(new ScanCommand({ TableName: TABLES.BOOKINGS }));
+    res.json(Items || []);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Could not fetch bookings' });
+  }
+};
+
 module.exports = {
   createBooking,
   getBooking,
+  getAllBookings,
 };

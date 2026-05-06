@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, SafeAreaView, ActivityIndicator, Text } from 'react-native';
 import axios from 'axios';
 import styled from 'styled-components/native';
 import { theme } from '../theme';
@@ -7,21 +7,21 @@ import Card from '../components/Card';
 
 const API_URL = 'http://localhost:4000/api';
 
-const Container = styled.SafeAreaView`
+const Container = styled(SafeAreaView)`
   flex: 1;
   background-color: ${theme.colors.background};
   align-items: center;
   justify-content: center;
 `;
 
-const Header = styled.View`
+const Header = styled(View)`
   position: absolute;
   top: 60px;
   width: 100%;
   padding: 0 ${theme.spacing.lg}px;
 `;
 
-const Title = styled.Text`
+const Title = styled(Text)`
   color: ${theme.colors.secondary};
   font-size: 28px;
   font-weight: bold;
@@ -62,11 +62,15 @@ const DiscoveryScreen = () => {
 
   const fetchUsers = async () => {
     try {
-      // Logic to fetch from backend could go here
-      // For the demo, we use MOCK_USERS
-      setUsers(MOCK_USERS);
+      const response = await axios.get(`${API_URL}/users/discover`, {
+        params: { userId: 'demo-user' } // Use real userId in production
+      });
+      // Fall back to mock data if API returns empty or fails
+      const data = response.data && response.data.length > 0 ? response.data : MOCK_USERS;
+      setUsers(data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users, using mock data:', error);
+      setUsers(MOCK_USERS);
     } finally {
       setLoading(false);
     }

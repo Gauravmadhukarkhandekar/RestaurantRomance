@@ -1,58 +1,58 @@
 import React from 'react';
-import { FlatList, TouchableOpacity, Image } from 'react-native';
+import { FlatList, TouchableOpacity, Image, SafeAreaView, View, Text } from 'react-native';
 import styled from 'styled-components/native';
 import { theme } from '../theme';
 
-const Container = styled.SafeAreaView`
+const Container = styled(SafeAreaView)`
   flex: 1;
   background-color: ${theme.colors.background};
 `;
 
-const Header = styled.View`
+const Header = styled(View)`
   padding: ${theme.spacing.lg}px;
 `;
 
-const Title = styled.Text`
+const Title = styled(Text)`
   color: ${theme.colors.text};
   font-size: 24px;
   font-weight: bold;
 `;
 
-const Subtitle = styled.Text`
+const Subtitle = styled(Text)`
   color: ${theme.colors.secondary};
   font-size: 16px;
   margin-top: 4px;
 `;
 
-const RestaurantCard = styled.TouchableOpacity`
+const RestaurantCard = styled(TouchableOpacity)`
   background-color: ${theme.colors.surface};
   margin: ${theme.spacing.md}px;
   border-radius: ${theme.borderRadius.md}px;
   overflow: hidden;
 `;
 
-const RestaurantImage = styled.Image`
+const RestaurantImage = styled(Image)`
   width: 100%;
   height: 200px;
 `;
 
-const Info = styled.View`
+const Info = styled(View)`
   padding: ${theme.spacing.md}px;
 `;
 
-const Name = styled.Text`
+const Name = styled(Text)`
   color: ${theme.colors.text};
   font-size: 18px;
   font-weight: bold;
 `;
 
-const Cuisine = styled.Text`
+const Cuisine = styled(Text)`
   color: ${theme.colors.textSecondary};
   font-size: 14px;
   margin-top: 2px;
 `;
 
-const DiscountBadge = styled.View`
+const DiscountBadge = styled(View)`
   position: absolute;
   top: 10px;
   right: 10px;
@@ -61,7 +61,7 @@ const DiscountBadge = styled.View`
   border-radius: ${theme.borderRadius.sm}px;
 `;
 
-const DiscountText = styled.Text`
+const DiscountText = styled(Text)`
   color: ${theme.colors.text};
   font-size: 12px;
   font-weight: bold;
